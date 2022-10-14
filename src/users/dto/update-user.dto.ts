@@ -1,4 +1,5 @@
 import { IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { Match } from '../../decorators/match.decorator';
 
 export class UpdateUserDto {
   @IsNotEmpty()
@@ -8,6 +9,12 @@ export class UpdateUserDto {
   @MinLength(8)
   @MaxLength(16)
   password: string;
+
+  @IsNotEmpty()
+  @Match('password', {
+    message: 'passwords do not match',
+  })
+  confirmPassword: string;
 
   @IsNotEmpty()
   readonly email: string;
