@@ -9,7 +9,7 @@ async function bootstrap() {
       exceptionFactory: (errors) => {
         return new UnprocessableEntityException(
           errors.map((error) => ({
-            field: error.property,
+            property: error.property,
             message:
               error.constraints[Object.keys(error.constraints).slice(-1)[0]],
             constraints: error.constraints,

@@ -1,5 +1,7 @@
-import { IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 import { Match } from '../../decorators/match.decorator';
+import { User } from '../../typeorm/User';
+import { IsUniqueOnDatabase } from '../../validations/is-unique.validation';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -17,5 +19,7 @@ export class CreateUserDto {
   confirmPassword: string;
 
   @IsNotEmpty()
+  @IsEmail()
+  // @IsUniqueOnDatabase(User, { message: 'This email already exists' })
   readonly email: string;
 }
