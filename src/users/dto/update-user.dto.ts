@@ -20,6 +20,6 @@ export class UpdateUserDto {
 
   @IsNotEmpty()
   @IsEmail()
-  // @IsUniqueOnDatabase(User, { message: 'This email already exists' })
+  // @IsUniqueOnDatabase(User, { message: 'This email already exists' }) //todo fix Unique validation
   readonly email: string;
 }

@@ -15,6 +15,14 @@ export class UsersService {
     return this.userRepository.findOneBy({ email });
   }
 
+  async findById(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (user.password) {
+      delete user.password;
+    }
+    return user;
+  }
+
   async createUser(createUserDto: CreateUserDto) {
     const password = await bcrypt.hash(createUserDto.password, 10);
     const newUser = this.userRepository.create({ ...createUserDto, password });
