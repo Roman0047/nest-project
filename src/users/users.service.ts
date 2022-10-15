@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../typeorm/User';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Role } from '../enums/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +32,11 @@ export class UsersService {
     if (user) {
       throw new BadRequestException('This email already exists');
     }
-    const newUser = this.userRepository.create({ ...createUserDto, password });
+    const newUser = this.userRepository.create({
+      ...createUserDto,
+      role: Role.User,
+      password,
+    });
     return await this.userRepository.save(newUser);
   }
 }
