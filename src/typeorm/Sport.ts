@@ -7,4 +7,10 @@ export class Sport {
 
   @Column()
   name: string;
+
+  @Column()
+  description: string;
+
+  @Column()
+  image: string;
 }
