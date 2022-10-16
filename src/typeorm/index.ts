@@ -1,3 +1,4 @@
-import { User } from './User'
+import { User } from './User';
+import { Sport } from './Sport';
 
-export default [User];
+export default [User, Sport];
