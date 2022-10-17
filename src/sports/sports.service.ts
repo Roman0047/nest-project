@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sport } from '../typeorm/Sport';
@@ -15,8 +15,12 @@ export class SportsService {
     return this.sportRepository.find();
   }
 
-  getById(id: string) {
-    return this.sportRepository.findOneBy({ id: parseInt(id) });
+  async getById(id: string) {
+    if (!parseInt(id)) throw new NotFoundException();
+
+    const item = await this.sportRepository.findOneBy({ id: parseInt(id) });
+    if (item) return item;
+    throw new NotFoundException();
   }
 
   create(dto: CreateSportDto) {
