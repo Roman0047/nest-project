@@ -8,6 +8,7 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { SportsService } from './sports.service';
 import { CreateSportDto } from './dto/create-sport.dto';
@@ -36,6 +37,14 @@ export class SportsController {
   @UsePipes(ValidationPipe)
   create(@Body() createSportDto: CreateSportDto) {
     return this.sportsService.create(createSportDto);
+  }
+
+  @Roles(Role.Admin)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Patch(':id')
+  @UsePipes(ValidationPipe)
+  update(@Param('id') id: string, @Body() createSportDto: CreateSportDto) {
+    return this.sportsService.update(id, createSportDto);
   }
 
   @Roles(Role.Admin)

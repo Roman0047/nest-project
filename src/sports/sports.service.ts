@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sport } from '../typeorm/Sport';
 import { CreateSportDto } from './dto/create-sport.dto';
+import { UpdateSportDto } from "./dto/update-sport.dto";
 
 @Injectable()
 export class SportsService {
@@ -26,6 +27,16 @@ export class SportsService {
   create(dto: CreateSportDto) {
     const newSport = this.sportRepository.create(dto);
     return this.sportRepository.save(newSport);
+  }
+
+  async update(id: string, dto: UpdateSportDto) {
+    if (!parseInt(id)) throw new NotFoundException();
+
+    const sport = this.sportRepository.create(dto);
+    if (!sport.id) {
+      sport.id = parseInt(id);
+    }
+    return await this.sportRepository.save(sport);
   }
 
   async remove(id: string) {
