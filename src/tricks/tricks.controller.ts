@@ -10,48 +10,48 @@ import {
   UseGuards,
   Patch,
 } from '@nestjs/common';
-import { SportsService } from './sports.service';
-import { CreateSportDto } from './dto/create-sport.dto';
+import { TricksService } from './tricks.service';
+import { CreateTrickDto } from './dto/create-trick.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Role } from '../enums/role.enum';
-import { UpdateSportDto } from './dto/update-sport.dto';
+import { UpdateTrickDto } from './dto/update-trick.dto';
 
-@Controller('sports')
-export class SportsController {
-  constructor(private readonly sportsService: SportsService) {}
+@Controller('tricks')
+export class TricksController {
+  constructor(private readonly tricksService: TricksService) {}
 
   @Get()
   getAll() {
-    return this.sportsService.getAll();
+    return this.tricksService.getAll();
   }
 
   @Get(':id')
   getOne(@Param('id') id: string) {
-    return this.sportsService.getById(id);
+    return this.tricksService.getById(id);
   }
 
   @Roles(Role.Admin)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   @UsePipes(ValidationPipe)
-  create(@Body() dto: CreateSportDto) {
-    return this.sportsService.create(dto);
+  create(@Body() dto: CreateTrickDto) {
+    return this.tricksService.create(dto);
   }
 
   @Roles(Role.Admin)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
   @UsePipes(ValidationPipe)
-  update(@Param('id') id: string, @Body() dto: UpdateSportDto) {
-    return this.sportsService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateTrickDto) {
+    return this.tricksService.update(id, dto);
   }
 
   @Roles(Role.Admin)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.sportsService.remove(id);
+    return this.tricksService.remove(id);
   }
 }

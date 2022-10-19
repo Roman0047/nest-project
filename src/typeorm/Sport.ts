@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Trick } from './Trick';
 
 @Entity()
 export class Sport {
@@ -13,4 +14,7 @@ export class Sport {
 
   @Column()
   image: string;
+
+  @OneToMany(() => Trick, (trick) => trick.sport)
+  tricks: Trick[];
 }
