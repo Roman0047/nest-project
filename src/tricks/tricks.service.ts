@@ -26,6 +26,7 @@ export class TricksService {
 
   create(dto: CreateTrickDto) {
     const newTrick = this.trickRepository.create(dto);
+    newTrick.sport = dto.sport;
     return this.trickRepository.save(newTrick);
   }
 

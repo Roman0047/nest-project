@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { SportsModule } from './sports/sports.module';
 import entities from './typeorm';
 import { MulterModule } from '@nestjs/platform-express';
+import { TricksModule } from './tricks/tricks.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MulterModule } from '@nestjs/platform-express';
     AuthModule,
     UsersModule,
     SportsModule,
+    TricksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

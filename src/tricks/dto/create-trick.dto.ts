@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { Sport } from '../../typeorm/Sport';
 
 export class CreateTrickDto {
   @IsNotEmpty()
@@ -12,4 +13,6 @@ export class CreateTrickDto {
 
   @IsNotEmpty()
   readonly complexity: string;
+
+  sport: Sport;
 }
