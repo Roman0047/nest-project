@@ -12,13 +12,17 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { UsersService } from './users/users.service';
 // import { Roles } from './decorators/roles.decorator';
 // import { Role } from './enums/role.enum';
 // import { RolesGuard } from './guards/roles.guard';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private usersService: UsersService,
+  ) {}
 
   @Get()
   // @Roles(Role.Admin) // todo add Admin guard for sports creation
@@ -30,7 +34,7 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user;
+    return this.usersService.findById(req.user.id);
   }
 
   @Post('file')

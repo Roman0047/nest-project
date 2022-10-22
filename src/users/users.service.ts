@@ -5,11 +5,13 @@ import { User } from '../typeorm/User';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../enums/role.enum';
+import { ThemeService } from '../theme/theme.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private themeService: ThemeService,
   ) {}
 
   async findByEmail(email: string) {
@@ -17,7 +19,12 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: {
+        theme: true,
+      },
+    });
     if (user.password) {
       delete user.password;
     }
@@ -26,10 +33,10 @@ export class UsersService {
 
   async createUser(createUserDto: CreateUserDto) {
     const password = await bcrypt.hash(createUserDto.password, 10);
-    const user = await this.userRepository.findOneBy({
+    const userWithSameEmail = await this.userRepository.findOneBy({
       email: createUserDto.email,
     });
-    if (user) {
+    if (userWithSameEmail) {
       throw new BadRequestException('This email already exists');
     }
     const newUser = this.userRepository.create({
@@ -37,6 +44,8 @@ export class UsersService {
       role: Role.User,
       password,
     });
-    return await this.userRepository.save(newUser);
+    const user = await this.userRepository.save(newUser);
+    await this.themeService.create(user);
+    return await this.findById(user.id);
   }
 }
