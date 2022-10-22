@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   UseGuards,
   Patch,
+  Query
 } from '@nestjs/common';
 import { SportsService } from './sports.service';
 import { CreateSportDto } from './dto/create-sport.dto';
@@ -23,8 +24,8 @@ export class SportsController {
   constructor(private readonly sportsService: SportsService) {}
 
   @Get()
-  getAll() {
-    return this.sportsService.getAll();
+  getAll(@Query('search') search) {
+    return this.sportsService.getAll({ search });
   }
 
   @Get(':id')

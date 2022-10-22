@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sport } from '../typeorm/Sport';
 import { CreateSportDto } from './dto/create-sport.dto';
@@ -12,8 +12,12 @@ export class SportsService {
     private readonly sportRepository: Repository<Sport>,
   ) {}
 
-  getAll() {
-    return this.sportRepository.find();
+  getAll({ search }) {
+    return this.sportRepository.find({
+      where: {
+        name: Like(`%${search}%`),
+      },
+    });
   }
 
   async getById(id: string) {
