@@ -24,8 +24,8 @@ export class SportsController {
   constructor(private readonly sportsService: SportsService) {}
 
   @Get()
-  getAll(@Query('search') search) {
-    return this.sportsService.getAll({ search });
+  getAll(@Query('search') search, @Query('tricks') tricks) {
+    return this.sportsService.getAll({ search, tricks });
   }
 
   @Get(':id')

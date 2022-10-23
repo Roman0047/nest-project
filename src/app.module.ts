@@ -9,6 +9,7 @@ import entities from './typeorm';
 import { MulterModule } from '@nestjs/platform-express';
 import { TricksModule } from './tricks/tricks.module';
 import { ThemeModule } from './theme/theme.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ThemeModule } from './theme/theme.module';
     SportsModule,
     TricksModule,
     ThemeModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

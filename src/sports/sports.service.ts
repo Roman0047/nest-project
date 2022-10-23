@@ -12,10 +12,13 @@ export class SportsService {
     private readonly sportRepository: Repository<Sport>,
   ) {}
 
-  getAll({ search }) {
+  getAll({ search, tricks }) {
     return this.sportRepository.find({
       where: {
-        name: Like(`%${search}%`),
+        name: Like(`%${search || ''}%`),
+      },
+      relations: {
+        tricks: !!tricks,
       },
     });
   }

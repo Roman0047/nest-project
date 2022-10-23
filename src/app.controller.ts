@@ -13,9 +13,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UsersService } from './users/users.service';
-// import { Roles } from './decorators/roles.decorator';
-// import { Role } from './enums/role.enum';
-// import { RolesGuard } from './guards/roles.guard';
 
 @Controller()
 export class AppController {
@@ -25,8 +22,6 @@ export class AppController {
   ) {}
 
   @Get()
-  // @Roles(Role.Admin) // todo add Admin guard for sports creation
-  // @UseGuards(JwtAuthGuard, RolesGuard)
   getHello(): string {
     return this.appService.getHello();
   }

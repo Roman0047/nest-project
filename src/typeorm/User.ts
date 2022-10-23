@@ -1,6 +1,14 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role } from '../enums/role.enum';
 import { Theme } from './Theme';
+import { Trick } from './Trick';
+import { Post } from './Post';
 
 @Entity()
 export class User {
@@ -24,4 +32,7 @@ export class User {
 
   @OneToOne(() => Theme, (theme) => theme.user)
   theme: Theme;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 }
