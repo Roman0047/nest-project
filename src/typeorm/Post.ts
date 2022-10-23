@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
 import { Sport } from './Sport';
 import { Trick } from './Trick';
@@ -27,11 +20,9 @@ export class Post {
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
   user: User;
 
-  @OneToOne(() => Sport)
-  @JoinColumn()
+  @ManyToOne(() => Sport, (sport) => sport.posts, { onDelete: 'CASCADE' })
   sport: Sport;
 
-  @OneToOne(() => Trick)
-  @JoinColumn()
+  @ManyToOne(() => Trick, (trick) => trick.posts, { onDelete: 'CASCADE' })
   trick: Trick;
 }

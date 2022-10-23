@@ -12,8 +12,15 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
-  getAll() {
-    return this.postRepository.find();
+  getAll({ sport, trick, user }) {
+    return this.postRepository.find({
+      relations: {
+        sport: !!sport,
+        trick: !!trick,
+        user: !!user,
+      },
+      order: { id: 'DESC' },
+    });
   }
 
   async getById(id: string) {

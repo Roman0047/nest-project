@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
   UsePipes,
@@ -18,8 +19,8 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  getAll() {
-    return this.postsService.getAll();
+  getAll(@Query('sport') sport, @Query('trick') trick, @Query('user') user) {
+    return this.postsService.getAll({ sport, trick, user });
   }
 
   @Get(':id')
