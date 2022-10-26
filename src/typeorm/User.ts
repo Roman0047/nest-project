@@ -7,7 +7,6 @@ import {
 } from 'typeorm';
 import { Role } from '../enums/role.enum';
 import { Theme } from './Theme';
-import { Trick } from './Trick';
 import { Post } from './Post';
 
 @Entity()
@@ -23,6 +22,9 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column()
+  avatar: string;
 
   @Column({
     nullable: false,
