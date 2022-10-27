@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Patch,
   Post,
   Request,
@@ -27,5 +29,11 @@ export class UsersController {
   @UsePipes(ValidationPipe)
   update(@Body() dto: UpdateUserDto, @Request() req) {
     return this.usersService.updateUser(dto, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('users/:id')
+  getOne(@Param('id') id: string, @Request() req) {
+    return this.usersService.getById(id, req.user);
   }
 }

@@ -19,8 +19,18 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  getAll(@Query('sport') sport, @Query('trick') trick, @Query('user') user) {
-    return this.postsService.getAll({ sport, trick, user });
+  getAll(
+    @Query('sport') sport,
+    @Query('trick') trick,
+    @Query('user') user,
+    @Query('userId') userId,
+  ) {
+    return this.postsService.getAll({
+      sport,
+      trick,
+      user,
+      userId,
+    });
   }
 
   @Get(':id')

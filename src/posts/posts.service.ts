@@ -12,8 +12,15 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
-  getAll({ sport, trick, user }) {
+  getAll({ sport, trick, user, userId }) {
     return this.postRepository.find({
+      where: userId
+        ? {
+            user: {
+              id: userId,
+            },
+          }
+        : undefined,
       relations: {
         sport: !!sport,
         trick: !!trick,

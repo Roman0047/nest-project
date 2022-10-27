@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../typeorm/User';
@@ -6,13 +10,16 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../enums/role.enum';
 import { ThemeService } from '../theme/theme.service';
-import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdateUserDto } from './dto/update-user.dto';
+import { Subscriber } from '../typeorm/Subscriber';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private themeService: ThemeService,
+    @InjectRepository(Subscriber)
+    private readonly subscriberRepository: Repository<Subscriber>,
   ) {}
 
   async findByEmail(email: string) {
@@ -30,6 +37,43 @@ export class UsersService {
       delete user.password;
     }
     return user;
+  }
+
+  async getById(id: string, user?: User) {
+    if (!parseInt(id)) throw new NotFoundException();
+
+    const item = await this.userRepository.findOneBy({ id: parseInt(id) });
+    if (item) {
+      if (item.password) {
+        delete item.password;
+      }
+
+      let isSubscribed = false;
+
+      if (user) {
+        isSubscribed = !!(await this.isSubscribed(id, user.id));
+      }
+
+      return {
+        ...item,
+        isSubscribed,
+      };
+    }
+
+    throw new NotFoundException();
+  }
+
+  async isSubscribed(userId, subscriberId) {
+    return await this.subscriberRepository.findOne({
+      where: {
+        user: {
+          id: userId,
+        },
+        subscriber: {
+          id: subscriberId,
+        },
+      },
+    });
   }
 
   async createUser(createUserDto: CreateUserDto) {

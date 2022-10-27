@@ -10,6 +10,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { TricksModule } from './tricks/tricks.module';
 import { ThemeModule } from './theme/theme.module';
 import { PostsModule } from './posts/posts.module';
+import { SubscribersModule } from './subscribers/subscribers.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PostsModule } from './posts/posts.module';
     TricksModule,
     ThemeModule,
     PostsModule,
+    SubscribersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
