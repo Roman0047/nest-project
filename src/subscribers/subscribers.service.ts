@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../typeorm/User';
@@ -10,6 +10,7 @@ export class SubscribersService {
   constructor(
     @InjectRepository(Subscriber)
     private readonly subscriberRepository: Repository<Subscriber>,
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
   ) {}
 
@@ -22,7 +23,7 @@ export class SubscribersService {
   }
 
   async create(id, user: User) {
-    const activeSubscription = await this.isSubscribed(id, user.id);
+    const activeSubscription = await this.getActiveSubscription(id, user.id);
     if (activeSubscription) {
       await this.subscriberRepository.delete(activeSubscription.id);
       return 'Unsubscribed';
@@ -35,7 +36,7 @@ export class SubscribersService {
     }
   }
 
-  async isSubscribed(userId, subscriberId) {
+  async getActiveSubscription(userId, subscriberId) {
     return await this.subscriberRepository.findOne({
       where: {
         user: {

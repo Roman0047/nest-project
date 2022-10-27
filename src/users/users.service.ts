@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,15 +13,15 @@ import * as bcrypt from 'bcrypt';
 import { Role } from '../enums/role.enum';
 import { ThemeService } from '../theme/theme.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Subscriber } from '../typeorm/Subscriber';
+import { SubscribersService } from '../subscribers/subscribers.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private themeService: ThemeService,
-    @InjectRepository(Subscriber)
-    private readonly subscriberRepository: Repository<Subscriber>,
+    @Inject(forwardRef(() => SubscribersService))
+    private subscribersService: SubscribersService,
   ) {}
 
   async findByEmail(email: string) {
@@ -51,7 +53,10 @@ export class UsersService {
       let isSubscribed = false;
 
       if (user) {
-        isSubscribed = !!(await this.isSubscribed(id, user.id));
+        isSubscribed = !!(await this.subscribersService.getActiveSubscription(
+          id,
+          user.id,
+        ));
       }
 
       return {
@@ -61,19 +66,6 @@ export class UsersService {
     }
 
     throw new NotFoundException();
-  }
-
-  async isSubscribed(userId, subscriberId) {
-    return await this.subscriberRepository.findOne({
-      where: {
-        user: {
-          id: userId,
-        },
-        subscriber: {
-          id: subscriberId,
-        },
-      },
-    });
   }
 
   async createUser(createUserDto: CreateUserDto) {
