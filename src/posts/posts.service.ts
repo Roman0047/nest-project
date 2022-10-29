@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from '../typeorm/Post';
@@ -14,15 +14,13 @@ export class PostsService {
     private subscribersService: SubscribersService,
   ) {}
 
-  getAll({ sport, trick, user, userId }) {
+  getAll({ sport, trick, user, userId, sportId, trickId, postId }) {
     return this.postRepository.find({
-      where: userId
-        ? {
-            user: {
-              id: userId,
-            },
-          }
-        : undefined,
+      where: {
+        ...(userId && { user: { id: userId } }),
+        ...(sportId && { sport: { id: sportId }, id: Not(postId) }),
+        ...(trickId && { trick: { id: trickId }, id: Not(postId) }),
+      },
       relations: {
         sport: !!sport,
         trick: !!trick,

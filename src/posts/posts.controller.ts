@@ -24,12 +24,18 @@ export class PostsController {
     @Query('trick') trick,
     @Query('user') user,
     @Query('userId') userId,
+    @Query('sportId') sportId,
+    @Query('trickId') trickId,
+    @Query('postId') postId,
   ) {
     return this.postsService.getAll({
       sport,
       trick,
       user,
       userId,
+      sportId,
+      trickId,
+      postId,
     });
   }
 
