@@ -15,6 +15,12 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class SubscribersController {
   constructor(private readonly subscribersService: SubscribersService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Get('subscriptions')
+  getSubscriptions(@Request() req) {
+    return this.subscribersService.getSubscriptionsUsers(req.user.id);
+  }
+
   @Get(':id')
   getSubscribersLength(@Param('id') id: string) {
     return this.subscribersService.getSubscribersLength(id);

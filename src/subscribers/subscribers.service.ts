@@ -14,11 +14,20 @@ export class SubscribersService {
     private usersService: UsersService,
   ) {}
 
-  getSubscriptions(id) {
+  getSubscriptions(id, user?) {
     return this.subscriberRepository.find({
       where: {
         subscriber: { id },
       },
+      relations: { user },
+    });
+  }
+
+  async getSubscriptionsUsers(id) {
+    const subscriptions = await this.getSubscriptions(id, true);
+    return subscriptions.map((item) => {
+      delete item.user.password;
+      return item.user;
     });
   }
 
