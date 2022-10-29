@@ -1,15 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from '../typeorm/Post';
 import { User } from '../typeorm/User';
+import { SubscribersService } from '../subscribers/subscribers.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+    private subscribersService: SubscribersService,
   ) {}
 
   getAll({ sport, trick, user, userId }) {
@@ -30,10 +32,35 @@ export class PostsService {
     });
   }
 
+  async getSubscriptionsPost(id) {
+    const subscriptions = await this.subscribersService.getSubscriptions(id);
+    const subscriptionsIds = subscriptions.map((item) => item.userId);
+    return this.postRepository.find({
+      where: {
+        user: {
+          id: In(subscriptionsIds),
+        },
+      },
+      relations: {
+        sport: true,
+        trick: true,
+        user: true,
+      },
+      order: { id: 'DESC' },
+    });
+  }
+
   async getById(id: string) {
     if (!parseInt(id)) throw new NotFoundException();
 
-    const item = await this.postRepository.findOneBy({ id: parseInt(id) });
+    const item = await this.postRepository.findOne({
+      where: { id: parseInt(id) },
+      relations: {
+        sport: true,
+        trick: true,
+        user: true,
+      },
+    });
     if (item) return item;
     throw new NotFoundException();
   }

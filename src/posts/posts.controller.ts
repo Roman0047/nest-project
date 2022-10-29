@@ -33,6 +33,12 @@ export class PostsController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('subscriptions')
+  getSubscriptionsPosts(@Request() req) {
+    return this.postsService.getSubscriptionsPost(req.user.id);
+  }
+
   @Get(':id')
   getOne(@Param('id') id: string) {
     return this.postsService.getById(id);

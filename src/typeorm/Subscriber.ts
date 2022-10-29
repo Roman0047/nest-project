@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from 'typeorm';
 import { User } from './User';
 
 @Entity()
@@ -11,4 +11,10 @@ export class Subscriber {
 
   @ManyToOne(() => User, (user) => user.theme, { onDelete: 'SET NULL' })
   subscriber: User;
+
+  @RelationId((subscriber: Subscriber) => subscriber.user)
+  userId: number;
+
+  @RelationId((subscriber: Subscriber) => subscriber.subscriber)
+  subscriberId: number;
 }

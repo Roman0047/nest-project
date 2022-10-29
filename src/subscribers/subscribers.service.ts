@@ -14,6 +14,14 @@ export class SubscribersService {
     private usersService: UsersService,
   ) {}
 
+  getSubscriptions(id) {
+    return this.subscriberRepository.find({
+      where: {
+        subscriber: { id },
+      },
+    });
+  }
+
   getSubscribersLength(id) {
     return this.subscriberRepository.count({
       where: {
