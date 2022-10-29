@@ -25,20 +25,20 @@ export class UsersService {
   ) {}
 
   async findByEmail(email: string) {
-    return this.userRepository.findOneBy({ email });
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('email = :email', { email })
+      .getOne();
   }
 
   async findById(id: number) {
-    const user = await this.userRepository.findOne({
+    return await this.userRepository.findOne({
       where: { id },
       relations: {
         theme: true,
       },
     });
-    if (user.password) {
-      delete user.password;
-    }
-    return user;
   }
 
   async getById(id: string, user?: User) {

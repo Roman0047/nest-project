@@ -32,7 +32,7 @@ export class PostsService {
     });
   }
 
-  async getSubscriptionsPost(id) {
+  async getSubscriptionsPosts(id) {
     const subscriptions = await this.subscribersService.getSubscriptions(id);
     const subscriptionsIds = subscriptions.map((item) => item.userId);
     return this.postRepository.find({
@@ -50,7 +50,7 @@ export class PostsService {
     });
   }
 
-  async getById(id: string) {
+  async getById(id: string, userId) {
     if (!parseInt(id)) throw new NotFoundException();
 
     const item = await this.postRepository.findOne({
@@ -61,7 +61,21 @@ export class PostsService {
         user: true,
       },
     });
-    if (item) return item;
+    if (item) {
+      const isSubscribed =
+        !!(await this.subscribersService.getActiveSubscription(
+          item.user.id,
+          userId,
+        ));
+
+      return {
+        ...item,
+        user: {
+          ...item.user,
+          isSubscribed,
+        },
+      };
+    }
     throw new NotFoundException();
   }
 

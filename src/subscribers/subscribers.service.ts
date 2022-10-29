@@ -26,7 +26,6 @@ export class SubscribersService {
   async getSubscriptionsUsers(id) {
     const subscriptions = await this.getSubscriptions(id, true);
     return subscriptions.map((item) => {
-      delete item.user.password;
       return item.user;
     });
   }
