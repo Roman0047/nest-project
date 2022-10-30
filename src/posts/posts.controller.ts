@@ -27,6 +27,9 @@ export class PostsController {
     @Query('sportId') sportId,
     @Query('trickId') trickId,
     @Query('postId') postId,
+    @Query('search') search,
+    @Query('sportsIds') sportsIds,
+    @Query('tricksIds') tricksIds,
   ) {
     return this.postsService.getAll({
       sport,
@@ -36,6 +39,9 @@ export class PostsController {
       sportId,
       trickId,
       postId,
+      search,
+      sportsIds,
+      tricksIds,
     });
   }
 
