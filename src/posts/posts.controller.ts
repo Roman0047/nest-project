@@ -47,8 +47,18 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('subscriptions')
-  getSubscriptionsPosts(@Request() req) {
-    return this.postsService.getSubscriptionsPosts(req.user.id);
+  getSubscriptionsPosts(
+    @Request() req,
+    @Query('sportsIds') sportsIds,
+    @Query('tricksIds') tricksIds,
+    @Query('search') search,
+  ) {
+    return this.postsService.getSubscriptionsPosts(
+      req.user.id,
+      sportsIds,
+      tricksIds,
+      search,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

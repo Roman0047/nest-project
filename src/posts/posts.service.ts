@@ -17,6 +17,48 @@ export class PostsService {
     private subscribersService: SubscribersService,
   ) {}
 
+  async getFilteredPosts(sportsIds, tricksIds) {
+    const sports = await this.sportRepository.find({
+      where: { id: In(sportsIds) },
+      relations: {
+        posts: {
+          sport: true,
+          trick: true,
+          user: true,
+        },
+      },
+    });
+    const sportsPosts = [];
+    sports.forEach((item) => sportsPosts.push(...item.posts));
+
+    if (tricksIds && tricksIds.length) {
+      const tricksPosts = [];
+
+      sports.forEach((sport: any) => {
+        const hasTricks = !!sport.tricksIds.find((id: any) =>
+          tricksIds.find((trickId) => parseInt(trickId) === id),
+        );
+
+        if (hasTricks) {
+          sport.posts.forEach((item: any) => {
+            if (
+              item.trick &&
+              tricksIds.find((trickId) => parseInt(trickId) === item.trick.id)
+            ) {
+              tricksPosts.push(item);
+            }
+          });
+        } else {
+          tricksPosts.push(...sport.posts);
+        }
+      });
+
+      return tricksPosts;
+    } else {
+      return sportsPosts;
+    }
+  }
+
   async getAll({
     sport,
     trick,
@@ -30,45 +72,8 @@ export class PostsService {
     tricksIds,
   }) {
     if (sportsIds && sportsIds.length) {
-      const sports = await this.sportRepository.find({
-        where: { id: In(sportsIds) },
-        relations: {
-          posts: {
-            sport: true,
-            trick: true,
-            user: true,
-          },
-        },
-      });
-      const sportsPosts = [];
-      sports.forEach((item) => sportsPosts.push(...item.posts));
-
-      if (tricksIds && tricksIds.length) {
-        const tricksPosts = [];
-
-        sports.forEach((sport: any) => {
-          const hasTricks = !!sport.tricksIds.find((id: any) =>
-            tricksIds.find((trickId) => parseInt(trickId) === id),
-          );
-
-          if (hasTricks) {
-            sport.posts.forEach((item: any) => {
-              if (
-                item.trick &&
-                tricksIds.find((trickId) => parseInt(trickId) === item.trick.id)
-              ) {
-                tricksPosts.push(item);
-              }
-            });
-          } else {
-            tricksPosts.push(...sport.posts);
-          }
-        });
-
-        return tricksPosts;
-      } else {
-        return sportsPosts;
-      }
+      const posts: any = await this.getFilteredPosts(sportsIds, tricksIds);
+      return posts.filter((item: any) => item.title.includes(search || ''));
     } else {
       return await this.postRepository.find({
         where: {
@@ -87,22 +92,34 @@ export class PostsService {
     }
   }
 
-  async getSubscriptionsPosts(id) {
+  async getSubscriptionsPosts(id, sportsIds, tricksIds, search) {
     const subscriptions = await this.subscribersService.getSubscriptions(id);
     const subscriptionsIds = subscriptions.map((item) => item.userId);
-    return this.postRepository.find({
-      where: {
-        user: {
-          id: In(subscriptionsIds),
+
+    if (sportsIds && sportsIds.length) {
+      const posts: any = await this.getFilteredPosts(sportsIds, tricksIds);
+      return posts.filter(
+        (item: any) =>
+          item.title.includes(search || '') &&
+          subscriptionsIds.find(
+            (subscription) => subscription === item.user.id,
+          ),
+      );
+    } else {
+      return this.postRepository.find({
+        where: {
+          user: {
+            id: In(subscriptionsIds),
+          },
         },
-      },
-      relations: {
-        sport: true,
-        trick: true,
-        user: true,
-      },
-      order: { id: 'DESC' },
-    });
+        relations: {
+          sport: true,
+          trick: true,
+          user: true,
+        },
+        order: { id: 'DESC' },
+      });
+    }
   }
 
   async getById(id: string, userId) {
