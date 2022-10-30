@@ -4,9 +4,10 @@ import { PostsService } from './posts.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from '../typeorm/Post';
 import { SubscribersModule } from '../subscribers/subscribers.module';
+import { Sport } from '../typeorm/Sport';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post]), SubscribersModule],
+  imports: [TypeOrmModule.forFeature([Post, Sport]), SubscribersModule],
   controllers: [PostsController],
   providers: [PostsService],
 })

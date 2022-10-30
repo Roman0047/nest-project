@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  RelationId,
+} from 'typeorm';
 import { Trick } from './Trick';
 import { Post } from './Post';
 
@@ -21,4 +27,7 @@ export class Sport {
 
   @OneToMany(() => Post, (post) => post.sport)
   posts: Post[];
+
+  @RelationId((sport: Sport) => sport.tricks)
+  tricksIds: number;
 }

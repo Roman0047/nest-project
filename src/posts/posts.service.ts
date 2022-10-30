@@ -5,16 +5,19 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from '../typeorm/Post';
 import { User } from '../typeorm/User';
 import { SubscribersService } from '../subscribers/subscribers.service';
+import { Sport } from '../typeorm/Sport';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+    @InjectRepository(Sport)
+    private readonly sportRepository: Repository<Sport>,
     private subscribersService: SubscribersService,
   ) {}
 
-  getAll({
+  async getAll({
     sport,
     trick,
     user,
@@ -26,23 +29,62 @@ export class PostsService {
     sportsIds,
     tricksIds,
   }) {
-    return this.postRepository.find({
-      where: {
-        title: Like(`%${search || ''}%`),
-        ...(userId && { user: { id: userId } }),
-        ...(sportId && { sport: { id: sportId }, id: Not(postId) }),
-        ...(trickId && { trick: { id: trickId }, id: Not(postId) }),
+    if (sportsIds && sportsIds.length) {
+      const sports = await this.sportRepository.find({
+        where: { id: In(sportsIds) },
+        relations: {
+          posts: {
+            sport: true,
+            trick: true,
+            user: true,
+          },
+        },
+      });
+      const sportsPosts = [];
+      sports.forEach((item) => sportsPosts.push(...item.posts));
 
-        ...(sportsIds && { sport: { id: In(sportsIds) } }),
-        ...(tricksIds && { trick: { id: In(tricksIds) } }),
-      },
-      relations: {
-        sport: !!sport,
-        trick: !!trick,
-        user: !!user,
-      },
-      order: { id: 'DESC' },
-    });
+      if (tricksIds && tricksIds.length) {
+        const tricksPosts = [];
+
+        sports.forEach((sport: any) => {
+          const hasTricks = !!sport.tricksIds.find((id: any) =>
+            tricksIds.find((trickId) => parseInt(trickId) === id),
+          );
+
+          if (hasTricks) {
+            sport.posts.forEach((item: any) => {
+              if (
+                item.trick &&
+                tricksIds.find((trickId) => parseInt(trickId) === item.trick.id)
+              ) {
+                tricksPosts.push(item);
+              }
+            });
+          } else {
+            tricksPosts.push(...sport.posts);
+          }
+        });
+
+        return tricksPosts;
+      } else {
+        return sportsPosts;
+      }
+    } else {
+      return await this.postRepository.find({
+        where: {
+          title: Like(`%${search || ''}%`),
+          ...(userId && { user: { id: userId } }),
+          ...(sportId && { sport: { id: sportId }, id: Not(postId) }),
+          ...(trickId && { trick: { id: trickId }, id: Not(postId) }),
+        },
+        relations: {
+          sport: !!sport,
+          trick: !!trick,
+          user: !!user,
+        },
+        order: { id: 'DESC' },
+      });
+    }
   }
 
   async getSubscriptionsPosts(id) {
