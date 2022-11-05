@@ -11,7 +11,8 @@ import { TricksModule } from './tricks/tricks.module';
 import { ThemeModule } from './theme/theme.module';
 import { PostsModule } from './posts/posts.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
-import { RatingsModule } from "./ratings/ratings.module";
+import { RatingsModule } from './ratings/ratings.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RatingsModule } from "./ratings/ratings.module";
     PostsModule,
     SubscribersModule,
     RatingsModule,
+    CommentsModule
   ],
   controllers: [AppController],
   providers: [AppService],

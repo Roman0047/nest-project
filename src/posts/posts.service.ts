@@ -179,6 +179,14 @@ export class PostsService {
         sport: true,
         trick: true,
         user: true,
+        comments: {
+          user: true,
+        },
+      },
+      order: {
+        comments: {
+          id: 'DESC',
+        },
       },
     });
     if (item) {

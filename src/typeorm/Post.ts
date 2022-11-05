@@ -1,14 +1,16 @@
 import {
   Column,
   Entity,
-  ManyToOne, OneToMany,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
-  RelationId
-} from "typeorm";
+  RelationId,
+} from 'typeorm';
 import { User } from './User';
 import { Sport } from './Sport';
 import { Trick } from './Trick';
-import { Rating } from "./Rating";
+import { Rating } from './Rating';
+import { Comment } from './Comment';
 
 @Entity()
 export class Post {
@@ -44,4 +46,7 @@ export class Post {
 
   @OneToMany(() => Rating, (rating) => rating.post)
   ratings: Rating[];
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
 }
