@@ -30,6 +30,7 @@ export class PostsController {
     @Query('search') search,
     @Query('sportsIds') sportsIds,
     @Query('tricksIds') tricksIds,
+    @Query('limit') limit,
   ) {
     return this.postsService.getAll({
       sport,
@@ -42,6 +43,7 @@ export class PostsController {
       search,
       sportsIds,
       tricksIds,
+      limit,
     });
   }
 

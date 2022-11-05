@@ -1,13 +1,14 @@
 import {
   Column,
   Entity,
-  ManyToOne,
+  ManyToOne, OneToMany,
   PrimaryGeneratedColumn,
-  RelationId,
-} from 'typeorm';
+  RelationId
+} from "typeorm";
 import { User } from './User';
 import { Sport } from './Sport';
 import { Trick } from './Trick';
+import { Rating } from "./Rating";
 
 @Entity()
 export class Post {
@@ -40,4 +41,7 @@ export class Post {
 
   @RelationId((post: Post) => post.trick)
   trickId: number;
+
+  @OneToMany(() => Rating, (rating) => rating.post)
+  ratings: Rating[];
 }

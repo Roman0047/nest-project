@@ -3,11 +3,13 @@ import {
   Entity,
   OneToMany,
   OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+  PrimaryGeneratedColumn, RelationId
+} from "typeorm";
 import { Role } from '../enums/role.enum';
 import { Theme } from './Theme';
 import { Post } from './Post';
+import { Subscriber } from './Subscriber';
+import { Rating } from "./Rating";
 
 @Entity()
 export class User {
@@ -39,4 +41,13 @@ export class User {
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
+
+  @OneToMany(() => Subscriber, (subscriber) => subscriber.user)
+  subscribers: Subscriber[];
+
+  @OneToMany(() => Subscriber, (subscriber) => subscriber.subscriber)
+  subscriptions: Subscriber[];
+
+  @OneToMany(() => Rating, (rating) => rating.user)
+  ratings: Rating[];
 }

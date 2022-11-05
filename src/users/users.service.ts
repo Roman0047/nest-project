@@ -37,6 +37,7 @@ export class UsersService {
       where: { id },
       relations: {
         theme: true,
+        ratings: true,
       },
     });
   }

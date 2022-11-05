@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { In, Like, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -6,6 +11,8 @@ import { Post } from '../typeorm/Post';
 import { User } from '../typeorm/User';
 import { SubscribersService } from '../subscribers/subscribers.service';
 import { Sport } from '../typeorm/Sport';
+import { RatingsService } from '../ratings/ratings.service';
+// import { Rating } from '../enums/rating.enum';
 
 @Injectable()
 export class PostsService {
@@ -15,6 +22,8 @@ export class PostsService {
     @InjectRepository(Sport)
     private readonly sportRepository: Repository<Sport>,
     private subscribersService: SubscribersService,
+    @Inject(forwardRef(() => RatingsService))
+    private ratingsService: RatingsService,
   ) {}
 
   async getFilteredPosts(sportsIds, tricksIds) {
@@ -70,12 +79,13 @@ export class PostsService {
     search,
     sportsIds,
     tricksIds,
+    limit,
   }) {
     if (sportsIds && sportsIds.length) {
       const posts: any = await this.getFilteredPosts(sportsIds, tricksIds);
       return posts.filter((item: any) => item.title.includes(search || ''));
     } else {
-      return await this.postRepository.find({
+      const posts = await this.postRepository.find({
         where: {
           title: Like(`%${search || ''}%`),
           ...(userId && { user: { id: userId } }),
@@ -86,9 +96,29 @@ export class PostsService {
           sport: !!sport,
           trick: !!trick,
           user: !!user,
+          // ratings: true,
         },
         order: { id: 'DESC' },
+        take: limit,
       });
+      // return posts.map((post: any) => {
+      //   post.likes = post.ratings.filter(
+      //     (rating) => rating.rating === Rating.Positive,
+      //   );
+      //   post.dislikes = post.ratings.filter(
+      //     (rating) => rating.rating === Rating.Negative,
+      //   );
+      //   return post;
+      // });
+
+      return await Promise.all(
+        posts.map(async (post) => {
+          return {
+            ...post,
+            ratings: await this.ratingsService.getPostRatingsCount(post.id),
+          };
+        }),
+      );
     }
   }
 
@@ -98,15 +128,24 @@ export class PostsService {
 
     if (sportsIds && sportsIds.length) {
       const posts: any = await this.getFilteredPosts(sportsIds, tricksIds);
-      return posts.filter(
+      const filteredSports = posts.filter(
         (item: any) =>
           item.title.includes(search || '') &&
           subscriptionsIds.find(
             (subscription) => subscription === item.user.id,
           ),
       );
+
+      return await Promise.all(
+        filteredSports.map(async (post) => {
+          return {
+            ...post,
+            ratings: await this.ratingsService.getPostRatingsCount(post.id),
+          };
+        }),
+      );
     } else {
-      return this.postRepository.find({
+      const posts = await this.postRepository.find({
         where: {
           user: {
             id: In(subscriptionsIds),
@@ -119,10 +158,19 @@ export class PostsService {
         },
         order: { id: 'DESC' },
       });
+
+      return await Promise.all(
+        posts.map(async (post) => {
+          return {
+            ...post,
+            ratings: await this.ratingsService.getPostRatingsCount(post.id),
+          };
+        }),
+      );
     }
   }
 
-  async getById(id: string, userId) {
+  async getById(id: string, userId?) {
     if (!parseInt(id)) throw new NotFoundException();
 
     const item = await this.postRepository.findOne({
@@ -134,19 +182,34 @@ export class PostsService {
       },
     });
     if (item) {
-      const isSubscribed =
-        !!(await this.subscribersService.getActiveSubscription(
+      let isSubscribed = false;
+
+      if (userId) {
+        isSubscribed = !!(await this.subscribersService.getActiveSubscription(
           item.user.id,
           userId,
         ));
-
+      }
       return {
         ...item,
+        ratings: await this.ratingsService.getPostRatingsCount(item.id),
         user: {
           ...item.user,
           isSubscribed,
         },
       };
+    }
+    throw new NotFoundException();
+  }
+
+  async getNativeById(id: string) {
+    if (!parseInt(id)) throw new NotFoundException();
+
+    const item = await this.postRepository.findOne({
+      where: { id: parseInt(id) },
+    });
+    if (item) {
+      return item;
     }
     throw new NotFoundException();
   }

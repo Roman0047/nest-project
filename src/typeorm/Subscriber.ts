@@ -6,10 +6,10 @@ export class Subscriber {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.theme, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.subscriptions, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => User, (user) => user.theme, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.subscribers, { onDelete: 'SET NULL' })
   subscriber: User;
 
   @RelationId((subscriber: Subscriber) => subscriber.user)
