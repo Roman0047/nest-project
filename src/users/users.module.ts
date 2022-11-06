@@ -6,10 +6,11 @@ import { User } from '../typeorm/User';
 import { ThemeModule } from '../theme/theme.module';
 import { Subscriber } from '../typeorm/Subscriber';
 import { SubscribersModule } from '../subscribers/subscribers.module';
+import { Sport } from '../typeorm/Sport';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Subscriber]),
+    TypeOrmModule.forFeature([User, Subscriber, Sport]),
     ThemeModule,
     forwardRef(() => SubscribersModule),
   ],

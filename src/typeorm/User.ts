@@ -1,15 +1,18 @@
 import {
   Column,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   OneToOne,
-  PrimaryGeneratedColumn, RelationId
-} from "typeorm";
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role } from '../enums/role.enum';
 import { Theme } from './Theme';
 import { Post } from './Post';
 import { Subscriber } from './Subscriber';
-import { Rating } from "./Rating";
+import { Rating } from './Rating';
+import { Sport } from './Sport';
 
 @Entity()
 export class User {
@@ -50,4 +53,8 @@ export class User {
 
   @OneToMany(() => Rating, (rating) => rating.user)
   ratings: Rating[];
+
+  @ManyToMany(() => Sport)
+  @JoinTable()
+  sports: Sport[];
 }

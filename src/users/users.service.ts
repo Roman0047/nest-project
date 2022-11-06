@@ -14,11 +14,14 @@ import { Role } from '../enums/role.enum';
 import { ThemeService } from '../theme/theme.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SubscribersService } from '../subscribers/subscribers.service';
+import { Sport } from '../typeorm/Sport';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Sport)
+    private readonly sportRepository: Repository<Sport>,
     private themeService: ThemeService,
     @Inject(forwardRef(() => SubscribersService))
     private subscribersService: SubscribersService,
@@ -38,14 +41,26 @@ export class UsersService {
       relations: {
         theme: true,
         ratings: true,
+        sports: true,
       },
     });
   }
 
-  async getById(id: string, user?: User) {
+  async getById(id: string, user?: User, sports?: boolean, tricks?: boolean) {
     if (!parseInt(id)) throw new NotFoundException();
 
-    const item = await this.userRepository.findOneBy({ id: parseInt(id) });
+    const item = await this.userRepository.findOne({
+      where: {
+        id: parseInt(id),
+      },
+      relations: {
+        sports: !!sports
+          ? {
+              tricks: !!tricks,
+            }
+          : false,
+      },
+    });
     if (item) {
       if (item.password) {
         delete item.password;
@@ -82,6 +97,7 @@ export class UsersService {
       role: Role.User,
       password,
     });
+    newUser.sports = createUserDto.sports;
     const user = await this.userRepository.save(newUser);
     await this.themeService.create(user);
     return await this.findById(user.id);
@@ -105,5 +121,22 @@ export class UsersService {
       newUser.id = parseInt(currentUser.id);
     }
     return await this.userRepository.save(newUser);
+  }
+
+  async addUserSport(id: string, currentUser) {
+    const sport = await this.sportRepository.findOneBy({ id: parseInt(id) });
+    const user = await this.userRepository.findOne({
+      where: {
+        id: currentUser.id,
+      },
+      relations: {
+        sports: true,
+      },
+    });
+    if (!user.id) {
+      user.id = parseInt(currentUser.id);
+    }
+    user.sports.push(sport);
+    return await this.userRepository.save(user);
   }
 }

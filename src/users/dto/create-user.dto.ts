@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 import { Match } from '../../decorators/match.decorator';
+import { Sport } from '../../typeorm/Sport';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -19,4 +20,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsEmail()
   readonly email: string;
+
+  sports: Sport[];
 }

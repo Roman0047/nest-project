@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
   UsePipes,
@@ -33,7 +34,18 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('users/:id')
-  getOne(@Param('id') id: string, @Request() req) {
-    return this.usersService.getById(id, req.user);
+  getOne(
+    @Param('id') id: string,
+    @Request() req,
+    @Query('sports') sports,
+    @Query('tricks') tricks,
+  ) {
+    return this.usersService.getById(id, req.user, sports, tricks);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('profile/add-sport/:id')
+  addSport(@Param('id') id: string, @Request() req) {
+    return this.usersService.addUserSport(id, req.user);
   }
 }
