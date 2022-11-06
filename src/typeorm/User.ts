@@ -13,6 +13,7 @@ import { Post } from './Post';
 import { Subscriber } from './Subscriber';
 import { Rating } from './Rating';
 import { Sport } from './Sport';
+import { Trick } from './Trick';
 
 @Entity()
 export class User {
@@ -57,4 +58,8 @@ export class User {
   @ManyToMany(() => Sport)
   @JoinTable()
   sports: Sport[];
+
+  @ManyToMany(() => Trick)
+  @JoinTable()
+  tricks: Trick[];
 }

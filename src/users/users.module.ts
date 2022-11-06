@@ -7,10 +7,11 @@ import { ThemeModule } from '../theme/theme.module';
 import { Subscriber } from '../typeorm/Subscriber';
 import { SubscribersModule } from '../subscribers/subscribers.module';
 import { Sport } from '../typeorm/Sport';
+import { Trick } from '../typeorm/Trick';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Subscriber, Sport]),
+    TypeOrmModule.forFeature([User, Subscriber, Sport, Trick]),
     ThemeModule,
     forwardRef(() => SubscribersModule),
   ],

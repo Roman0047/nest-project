@@ -15,6 +15,7 @@ import { ThemeService } from '../theme/theme.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SubscribersService } from '../subscribers/subscribers.service';
 import { Sport } from '../typeorm/Sport';
+import { Trick } from '../typeorm/Trick';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +23,8 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Sport)
     private readonly sportRepository: Repository<Sport>,
+    @InjectRepository(Trick)
+    private readonly trickRepository: Repository<Trick>,
     private themeService: ThemeService,
     @Inject(forwardRef(() => SubscribersService))
     private subscribersService: SubscribersService,
@@ -42,11 +45,18 @@ export class UsersService {
         theme: true,
         ratings: true,
         sports: true,
+        tricks: true,
       },
     });
   }
 
-  async getById(id: string, user?: User, sports?: boolean, tricks?: boolean) {
+  async getById(
+    id: string,
+    user?: User,
+    sports?: boolean,
+    tricks?: boolean,
+    completedTricks?: boolean,
+  ) {
     if (!parseInt(id)) throw new NotFoundException();
 
     const item = await this.userRepository.findOne({
@@ -59,6 +69,7 @@ export class UsersService {
               tricks: !!tricks,
             }
           : false,
+        tricks: !!completedTricks,
       },
     });
     if (item) {
@@ -126,17 +137,29 @@ export class UsersService {
   async addUserSport(id: string, currentUser) {
     const sport = await this.sportRepository.findOneBy({ id: parseInt(id) });
     const user = await this.userRepository.findOne({
-      where: {
-        id: currentUser.id,
-      },
-      relations: {
-        sports: true,
-      },
+      where: { id: currentUser.id },
+      relations: { sports: true },
     });
-    if (!user.id) {
-      user.id = parseInt(currentUser.id);
-    }
     user.sports.push(sport);
+    return await this.userRepository.save(user);
+  }
+
+  async addUserTrick(id: string, currentUser) {
+    const trick = await this.trickRepository.findOneBy({ id: parseInt(id) });
+    const user = await this.userRepository.findOne({
+      where: { id: currentUser.id },
+      relations: { tricks: true },
+    });
+    user.tricks.push(trick);
+    return await this.userRepository.save(user);
+  }
+
+  async removeUserTrick(id: string, currentUser) {
+    const user = await this.userRepository.findOne({
+      where: { id: currentUser.id },
+      relations: { tricks: true },
+    });
+    user.tricks = user.tricks.filter((item) => item.id !== parseInt(id));
     return await this.userRepository.save(user);
   }
 }

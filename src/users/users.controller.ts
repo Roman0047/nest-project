@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -39,13 +40,32 @@ export class UsersController {
     @Request() req,
     @Query('sports') sports,
     @Query('tricks') tricks,
+    @Query('completedTricks') completedTricks,
   ) {
-    return this.usersService.getById(id, req.user, sports, tricks);
+    return this.usersService.getById(
+      id,
+      req.user,
+      sports,
+      tricks,
+      completedTricks,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('profile/add-sport/:id')
   addSport(@Param('id') id: string, @Request() req) {
     return this.usersService.addUserSport(id, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('profile/add-trick/:id')
+  addTrick(@Param('id') id: string, @Request() req) {
+    return this.usersService.addUserTrick(id, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('profile/trick/:id')
+  removeTrick(@Param('id') id: string, @Request() req) {
+    return this.usersService.removeUserTrick(id, req.user);
   }
 }
